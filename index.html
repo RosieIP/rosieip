@@ -3,13 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RosieIP 代理二维码生成器</title>
+
+    <!-- ============================================================ -->
+    <!-- ===================== SEO 基础优化 ========================== -->
+    <!-- ============================================================ -->
+
+    <!-- 页面标题（浏览器标签栏显示） -->
+    <title>免费 SOCKS5 代理批量二维码生成器 | RosieIP 全球IP代理</title>
+
+    <!-- 页面描述（搜索引擎结果页显示） -->
+    <meta name="description" content="使用 RosieIP 免费在线工具，批量将 SOCKS5 代理转换为二维码。支持一键扫码导入 Shadowrocket、Clash 等客户端。纯净住宅IP，190+国家覆盖，全天候响应。">
+
+    <!-- 页面关键词 -->
+    <meta name="keywords" content="SOCKS5二维码生成,代理转换工具,批量生成二维码,RosieIP,代理IP,免费代理,Shadowrocket扫码,Clash代理,SOCKS5代理">
+
+    <!-- 搜索引擎抓取指令 -->
+    <meta name="robots" content="index, follow">
+
+    <!-- 网站作者 -->
+    <meta name="author" content="RosieIP 全球代理">
+
+    <!-- ============================================================ -->
+    <!-- ===================== 社交分享优化 (Open Graph) ============= -->
+    <!-- ============================================================ -->
+
+    <!-- 分享标题 -->
+    <meta property="og:title" content="免费 SOCKS5 代理批量二维码生成器 | RosieIP">
+
+    <!-- 分享描述 -->
+    <meta property="og:description" content="一键批量生成 SOCKS5 代理二维码，支持主流代理客户端扫码导入。纯前端本地运行，安全无隐私泄露。">
+
+    <!-- 分享网址（替换成你自己的域名） -->
+    <meta property="og:url" content="https://rosie.onip.cc/">
+
+    <!-- 网页类型 -->
+    <meta property="og:type" content="website">
+
+    <!-- 分享缩略图（1200x630，需上传图片） -->
+    <meta property="og:image" content="https://rosie.onip.cc/og-image.png">
+
+    <!-- ============================================================ -->
+    <!-- ===================== Twitter 卡片 ========================== -->
+    <!-- ============================================================ -->
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="免费 SOCKS5 代理批量二维码生成器 | RosieIP">
+    <meta name="twitter:description" content="一键批量生成 SOCKS5 代理二维码，纯前端本地运行，安全便捷。">
+    <meta name="twitter:image" content="https://rosie.onip.cc/og-image.png">
+
+    <!-- ============================================================ -->
+    <!-- ===================== 网页图标 (Favicon) ==================== -->
+    <!-- ============================================================ -->
+
+    <!-- 标准 favicon.ico（需上传到根目录） -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- 现代浏览器推荐使用 PNG 格式（建议 32x32 或 64x64） -->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="favicon-64x64.png">
+
+    <!-- ============================================================ -->
+    <!-- ===================== 结构化数据 (JSON-LD) ================== -->
+    <!-- ============================================================ -->
+
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "RosieIP SOCKS5 代理二维码生成器",
+            "description": "批量将 SOCKS5 代理转换为二维码的免费在线工具，支持主流代理客户端扫码导入。",
+            "applicationCategory": "Utility",
+            "operatingSystem": "All",
+            "browserRequirements": "Requires JavaScript",
+            "url": "https://rosie.onip.cc/",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "CNY"
+            }
+        }
+    </script>
+
+    <!-- ============================================================ -->
+    <!-- ===================== 加载 JS 库 ============================ -->
+    <!-- ============================================================ -->
+
     <!-- QRCode.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
     </script>
     <!-- JSZip -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js">
     </script>
+
     <style>
         /* ===== 全局样式 ===== */
         * {
@@ -46,7 +132,8 @@
             margin-bottom: 16px;
         }
         .brand-logo {
-            width: 150px;          /* 电脑端大小 */
+            width: 150px;
+            /* 电脑端大小 */
             height: 150px;
             object-fit: contain;
             border-radius: 12px;
@@ -196,7 +283,8 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            flex: 1 1 auto;          /* 允许按钮伸缩 */
+            flex: 1 1 auto;
+            /* 允许按钮伸缩 */
             justify-content: center;
             min-width: 120px;
         }
@@ -408,7 +496,8 @@
             }
             .brand-content .nav-links a {
                 font-size: 13px;
-                white-space: normal;   /* 允许换行 */
+                white-space: normal;
+                /* 允许换行 */
             }
 
             /* 特色标签 */
