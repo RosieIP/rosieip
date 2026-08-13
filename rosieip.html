@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SK5 代理批量二维码生成器</title>
+    <!-- QRCode.js 生成二维码 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
+    </script>
+    <!-- JSZip 打包下载 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js">
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            background: #f1f5f9;
+            display: flex;
+            justify-content: center;
+            padding: 30px 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 1100px;
+            width: 100%;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 30px 28px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
+            margin-bottom: 24px;
+        }
+        h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 6px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sub {
+            color: #475569;
+            font-size: 15px;
+            border-left: 4px solid #3b82f6;
+            padding-left: 14px;
+            margin: 0 0 24px 0;
+        }
+        .form-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #1e293b;
+            display: block;
+            margin-bottom: 5px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 14px 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 14px;
+            font-family: 'Menlo', 'Consolas', monospace;
+            background: #fafbfc;
+            resize: vertical;
+            transition: 0.2s;
+            line-height: 1.7;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+            background: #ffffff;
+        }
+        .hint {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 6px;
+        }
+        .hint code {
+            background: #eef2f6;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 4px;
+        }
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: scale(1.02);
+        }
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #1e293b;
+            border: 1px solid #e2e8f0;
+        }
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        .btn-success {
+            background: #22c55e;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #16a34a;
+        }
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .stats {
+            font-size: 14px;
+            color: #475569;
+            margin-left: 8px;
+        }
+        .output-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .qr-item {
+            background: #ffffff;
+            border: 1px solid #eef2f6;
+            border-radius: 20px;
+            padding: 18px 12px 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            transition: 0.2s;
+        }
+        .qr-item:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+        }
+        .qr-item .qr-wrap {
+            background: white;
+            padding: 6px;
+            border-radius: 12px;
+        }
+        .qr-item .qr-wrap canvas,
+        .qr-item .qr-wrap img {
+            display: block;
+            width: 130px;
+            height: 130px;
+        }
+        .qr-item .label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #334155;
+            margin: 10px 0 6px;
+            width: 100%;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            background: #f8fafc;
+            padding: 4px 8px;
+            border-radius: 30px;
+            font-family: monospace;
+            font-size: 11px;
+            max-width: 100%;
+        }
+        .qr-item .item-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .qr-item .item-actions button {
+            background: none;
+            border: 1px solid #e2e8f0;
+            border-radius: 30px;
+            padding: 4px 14px;
+            font-size: 11px;
+            font-weight: 500;
+            color: #1e293b;
+            cursor: pointer;
+            background: #f8fafc;
+            transition: 0.1s;
+        }
+        .qr-item .item-actions button:hover {
+            background: #e2e8f0;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #94a3b8;
+            font-size: 15px;
+        }
+        .error-msg {
+            color: #ef4444;
+            font-size: 13px;
+            padding: 8px 12px;
+            background: #fef2f2;
+            border-radius: 10px;
+            border-left: 4px solid #ef4444;
+            display: none;
+            margin: 6px 0;
+        }
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0f172a;
+            color: white;
+            padding: 10px 28px;
+            border-radius: 60px;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 999;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+        .toast.show {
+            opacity: 1;
+        }
+        .badge {
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 12px;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-weight: 500;
+        }
+        @media (max-width: 600px) {
+            .card {
+                padding: 18px 14px;
+            }
+            .output-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 14px;
+            }
+            .qr-item .qr-wrap canvas,
+            .qr-item .qr-wrap img {
+                width: 100px;
+                height: 100px;
+            }
+            .actions .btn {
+                flex: 1;
+                justify-content: center;
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="card">
+            <h1>📡 SK5 批量二维码</h1>
+            <p class="sub">每行一个代理，批量生成 SOCKS5 二维码，支持一键打包下载</p>
+
+            <div class="form-grid">
+                <div>
+                    <label>📝 输入代理列表</label>
+                    <textarea id="proxyInput" placeholder="每行一个代理，支持两种格式：&#10;1. IP:端口 (无认证)&#10;   例如：192.168.1.10:1080&#10;2. IP:端口:用户名:密码 (带认证)&#10;   例如：103.45.67.89:3128:user123:pass456">103.45.67.89:1080:demo:123456
+                    192.168.1.100:7890
+                    proxy.example.com:443:admin:securepass
+                    </textarea>
+                    <div class="hint">
+                        💡 支持 <code>host:port</code> 或 <code>host:port:user:pass</code> ，每行一条
+                    </div>
+                    <div class="error-msg" id="errorMsg">⚠️ 请检查输入格式，每行需为 host:port 或 host:port:user:pass</div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-primary" id="generateBtn">✨ 批量生成</button>
+                    <button class="btn btn-secondary" id="clearBtn">🗑️ 清空结果</button>
+                    <button class="btn btn-success" id="downloadAllBtn" disabled>📦 打包下载全部 (ZIP)</button>
+                    <button class="btn btn-secondary" id="fillSampleBtn">📋 填入示例</button>
+                </div>
+                <span class="stats" id="statsInfo"></span>
+            </div>
+        </div>
+
+        <!-- 输出区域 -->
+        <div class="card" id="resultCard" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+                <span style="font-weight:600; font-size:16px; color:#0f172a;">📱 生成的二维码</span>
+                <span class="badge" id="countBadge">0 个</span>
+            </div>
+            <div class="output-grid" id="outputGrid">
+                <div class="empty-state">暂无数据，请在上方输入代理并点击生成</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        (function() {
+            // DOM
+            const proxyInput = document.getElementById('proxyInput');
+            const generateBtn = document.getElementById('generateBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const downloadAllBtn = document.getElementById('downloadAllBtn');
+            const fillSampleBtn = document.getElementById('fillSampleBtn');
+            const outputGrid = document.getElementById('outputGrid');
+            const resultCard = document.getElementById('resultCard');
+            const statsInfo = document.getElementById('statsInfo');
+            const countBadge = document.getElementById('countBadge');
+            const errorMsg = document.getElementById('errorMsg');
+            const toast = document.getElementById('toast');
+
+            // 存储生成的二维码数据 (用于打包)
+            let qrItems = []; // [{url, canvasElement, index}]
+
+            // --- 工具函数 ---
+            function showToast(text) {
+                toast.textContent = text;
+                toast.classList.add('show');
+                clearTimeout(toast._timer);
+                toast._timer = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 2200);
+            }
+
+            function showError(msg) {
+                if (msg) {
+                    errorMsg.textContent = '⚠️ ' + msg;
+                    errorMsg.style.display = 'block';
+                } else {
+                    errorMsg.style.display = 'none';
+                }
+            }
+
+            function updateStats(count) {
+                statsInfo.textContent = count > 0 ? `共 ${count} 个代理` : '';
+                countBadge.textContent = count > 0 ? `${count} 个` : '0 个';
+                downloadAllBtn.disabled = count === 0;
+                if (count > 0) {
+                    resultCard.style.display = 'block';
+                } else {
+                    resultCard.style.display = 'none';
+                }
+            }
+
+            // 解析单行: host:port 或 host:port:user:pass
+            function parseLine(line) {
+                line = line.trim();
+                if (!line) return null;
+                const parts = line.split(':');
+                if (parts.length === 2) {
+                    const [host, port] = parts;
+                    if (!host || !port) return null;
+                    return { host: host.trim(), port: port.trim(), user: null, pass: null };
+                } else if (parts.length === 4) {
+                    const [host, port, user, pass] = parts;
+                    if (!host || !port || !user || !pass) return null;
+                    return { host: host.trim(), port: port.trim(), user: user.trim(), pass: pass.trim() };
+                } else {
+                    return null; // 格式错误
+                }
+            }
+
+            // 构建 socks5 URL
+            function buildProxyUrl(parsed) {
+                let url = 'socks5://';
+                if (parsed.user && parsed.pass) {
+                    url += encodeURIComponent(parsed.user) + ':' + encodeURIComponent(parsed.pass) + '@';
+                } else if (parsed.user && !parsed.pass) {
+                    // 只有用户名？保守处理，仍加上 @
+                    url += encodeURIComponent(parsed.user) + '@';
+                }
+                url += parsed.host + ':' + parsed.port;
+                return url;
+            }
+
+            // 生成单个二维码 DOM 节点
+            function createQRItem(index, url, parsed) {
+                const div = document.createElement('div');
+                div.className = 'qr-item';
+                div.dataset.index = index;
+
+                // 外框
+                const wrap = document.createElement('div');
+                wrap.className = 'qr-wrap';
+                const qrContainer = document.createElement('div');
+                qrContainer.id = `qr-${index}`;
+                wrap.appendChild(qrContainer);
+                div.appendChild(wrap);
+
+                // 标签（显示简短地址）
+                const label = document.createElement('div');
+                label.className = 'label';
+                label.textContent = parsed.host + ':' + parsed.port;
+                div.appendChild(label);
+
+                // 操作按钮
+                const actions = document.createElement('div');
+                actions.className = 'item-actions';
+
+                const copyBtn = document.createElement('button');
+                copyBtn.textContent = '复制链接';
+                copyBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    copyToClipboard(url);
+                };
+
+                const downloadBtn = document.createElement('button');
+                downloadBtn.textContent = '下载单张';
+                downloadBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    const canvas = qrContainer.querySelector('canvas');
+                    if (canvas) {
+                        downloadSingleImage(canvas, `socks5_${index+1}`);
+                    } else {
+                        showToast('二维码尚未渲染完成');
+                    }
+                };
+
+                actions.appendChild(copyBtn);
+                actions.appendChild(downloadBtn);
+                div.appendChild(actions);
+
+                // 生成二维码 (延迟渲染确保 DOM 已挂载)
+                setTimeout(() => {
+                    try {
+                        new QRCode(qrContainer, {
+                            text: url,
+                            width: 130,
+                            height: 130,
+                            colorDark: '#0f172a',
+                            colorLight: '#ffffff',
+                            correctLevel: QRCode.CorrectLevel.M
+                        });
+                        // 存储 canvas 引用用于打包
+                        const canvas = qrContainer.querySelector('canvas');
+                        if (canvas) {
+                            qrItems.push({ url, canvas, index });
+                        }
+                    } catch (e) {
+                        console.warn('QR 生成失败:', e);
+                        qrContainer.innerHTML = '<span style="font-size:12px;color:#ef4444;">生成失败</span>';
+                    }
+                }, 20);
+
+                return div;
+            }
+
+            // 复制
+            function copyToClipboard(text) {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        showToast('✅ 已复制链接');
+                    }).catch(() => fallbackCopy(text));
+                } else {
+                    fallbackCopy(text);
+                }
+            }
+
+            function fallbackCopy(text) {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                try {
+                    document.execCommand('copy');
+                    showToast('✅ 已复制链接');
+                } catch (e) {
+                    showToast('❌ 复制失败，请手动复制');
+                }
+                document.body.removeChild(ta);
+            }
+
+            // 下载单张图片
+            function downloadSingleImage(canvas, filename) {
+                const link = document.createElement('a');
+                link.download = `${filename}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showToast('⬇️ 下载成功');
+            }
+
+            // --- 核心：批量生成 ---
+            function batchGenerate() {
+                // 清空旧状态
+                qrItems = [];
+                outputGrid.innerHTML = '';
+                showError(null);
+
+                const raw = proxyInput.value;
+                const lines = raw.split('\n');
+                let validCount = 0;
+                let errorLines = [];
+
+                lines.forEach((line, idx) => {
+                    const trimmed = line.trim();
+                    if (!trimmed) return;
+                    const parsed = parseLine(trimmed);
+                    if (!parsed) {
+                        errorLines.push(idx + 1);
+                        return;
+                    }
+                    const url = buildProxyUrl(parsed);
+                    const itemDiv = createQRItem(validCount, url, parsed);
+                    outputGrid.appendChild(itemDiv);
+                    validCount++;
+                });
+
+                if (errorLines.length > 0) {
+                    showError(`第 ${errorLines.join(', ')} 行格式有误，已跳过 (需要 host:port 或 host:port:user:pass)`);
+                } else {
+                    showError(null);
+                }
+
+                updateStats(validCount);
+                if (validCount === 0) {
+                    outputGrid.innerHTML = `<div class="empty-state">❌ 没有识别到有效的代理，请检查输入格式</div>`;
+                    resultCard.style.display = 'block';
+                } else {
+                    showToast(`✅ 成功生成 ${validCount} 个二维码`);
+                }
+
+                // 滚动到结果区
+                resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            // --- 打包下载所有二维码 ---
+            function downloadAllAsZip() {
+                const canvases = outputGrid.querySelectorAll('.qr-item .qr-wrap canvas');
+                if (canvases.length === 0) {
+                    showToast('没有可用的二维码');
+                    return;
+                }
+
+                if (typeof JSZip === 'undefined') {
+                    showToast('⚠️ 依赖库加载中，请稍后重试');
+                    return;
+                }
+
+                const zip = new JSZip();
+                let loaded = 0;
+                const total = canvases.length;
+
+                canvases.forEach((canvas, idx) => {
+                    try {
+                        const dataUrl = canvas.toDataURL('image/png');
+                        // dataUrl 格式: data:image/png;base64,xxxx
+                        const base64 = dataUrl.split(',')[1];
+                        if (base64) {
+                            zip.file(`proxy_${idx+1}.png`, base64, { base64: true });
+                            loaded++;
+                        }
+                    } catch (e) {
+                        console.warn('打包失败:', e);
+                    }
+                });
+
+                if (loaded === 0) {
+                    showToast('没有有效的图片数据');
+                    return;
+                }
+
+                zip.generateAsync({ type: 'blob' }).then(blob => {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `socks5_proxies_${total}个.zip`;
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                    showToast(`📦 打包完成，共 ${loaded} 张图片`);
+                }).catch(err => {
+                    showToast('打包失败: ' + err.message);
+                });
+            }
+
+            // --- 清空结果 ---
+            function clearResults() {
+                outputGrid.innerHTML = `<div class="empty-state">已清空，请重新生成</div>`;
+                qrItems = [];
+                updateStats(0);
+                resultCard.style.display = 'block';
+                showError(null);
+                showToast('已清空');
+            }
+
+            // --- 填入示例 ---
+            function fillSample() {
+                proxyInput.value =
+                    `103.45.67.89:1080:demo:123456\n192.168.1.100:7890\nproxy.example.com:443:admin:securepass\n10.0.0.5:9999`;
+                showToast('已填入示例，点击 "批量生成" 即可');
+            }
+
+            // --- 事件绑定 ---
+            generateBtn.addEventListener('click', batchGenerate);
+
+            clearBtn.addEventListener('click', clearResults);
+
+            downloadAllBtn.addEventListener('click', downloadAllAsZip);
+
+            fillSampleBtn.addEventListener('click', fillSample);
+
+            // Ctrl+Enter 快捷生成
+            proxyInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault();
+                    batchGenerate();
+                }
+            });
+
+            // 初始状态
+            updateStats(0);
+            resultCard.style.display = 'none';
+
+            // 如果页面加载完成且 JSZip 未定义，提示
+            if (typeof JSZip === 'undefined') {
+                console.warn('JSZip 未加载，打包功能不可用');
+                // 但不影响主要功能
+            }
+
+            // 自动生成演示（可选：取消注释下一行可自动加载示例并生成）
+            // setTimeout(() => { fillSample(); batchGenerate(); }, 300);
+        })();
+    </script>
+</body>
+</html>
