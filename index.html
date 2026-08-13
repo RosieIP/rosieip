@@ -11,6 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js">
     </script>
     <style>
+        /* ===== 全局样式 ===== */
         * {
             box-sizing: border-box;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -28,30 +29,31 @@
             width: 100%;
         }
 
-        /* ===== 顶部品牌横幅：纵向居中布局 ===== */
+        /* ===== 顶部品牌横幅（纵向居中） ===== */
         .brand {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             border-radius: 28px 28px 0 0;
             padding: 30px 30px 20px;
             color: white;
             display: flex;
-            flex-direction: column;      /* 纵向排列 */
-            align-items: center;         /* 水平居中 */
+            flex-direction: column;
+            align-items: center;
             text-align: center;
         }
 
-        /* ---- 正方形 LOGO（居中） ---- */
+        /* ---- LOGO ---- */
         .logo-area {
             margin-bottom: 16px;
         }
         .brand-logo {
-            width: 150px;               /* 大小可调 */
-            height: 150px;              /* 与宽度一致，保持正方形 */
+            width: 150px;          /* 电脑端大小 */
+            height: 150px;
             object-fit: contain;
-            border-radius: 12px;        /* 圆角，不需要可删除 */
-            background: white;          /* 白底，如果图片有透明背景可保留 */
-            padding: 4px;               /* 白边效果 */
+            border-radius: 12px;
+            background: white;
+            padding: 4px;
             display: block;
+            transition: all 0.2s;
         }
 
         /* ---- 品牌名 + 导航（左右排列） ---- */
@@ -78,33 +80,24 @@
             opacity: 0.8;
             margin-top: 2px;
         }
+        .brand-content .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px 16px;
+        }
         .brand-content .nav-links a {
             color: #cbd5e1;
             text-decoration: none;
-            margin-left: 20px;
             font-size: 14px;
             transition: color 0.15s;
             border-bottom: 2px solid transparent;
             padding-bottom: 4px;
+            white-space: nowrap;
         }
         .brand-content .nav-links a:hover {
             color: #ffffff;
             border-bottom-color: #60a5fa;
-        }
-
-        @media (max-width: 600px) {
-            .brand-content {
-                flex-direction: column;
-                align-items: center;
-                gap: 12px;
-            }
-            .brand-content .nav-links a {
-                margin: 0 10px;
-            }
-            .brand-logo {
-                width: 120px;
-                height: 120px;
-            }
         }
 
         /* ===== 特色标签 ===== */
@@ -114,7 +107,8 @@
             border-bottom: 1px solid #eef2f6;
             display: flex;
             flex-wrap: wrap;
-            gap: 18px 30px;
+            justify-content: center;
+            gap: 12px 24px;
             font-size: 13px;
             color: #334155;
         }
@@ -128,7 +122,7 @@
             font-size: 14px;
         }
 
-        /* ===== 主功能卡片 ===== */
+        /* ===== 主卡片 ===== */
         .card {
             background: #ffffff;
             border-radius: 0 0 28px 28px;
@@ -136,7 +130,6 @@
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
             margin-bottom: 24px;
         }
-
         .sub {
             color: #475569;
             font-size: 15px;
@@ -186,6 +179,8 @@
             border-radius: 6px;
             font-size: 12px;
         }
+
+        /* ===== 按钮区域（自适应换行） ===== */
         .actions {
             display: flex;
             flex-wrap: wrap;
@@ -193,7 +188,7 @@
             margin-top: 4px;
         }
         .btn {
-            padding: 12px 28px;
+            padding: 12px 24px;
             border: none;
             border-radius: 40px;
             font-weight: 600;
@@ -203,6 +198,9 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            flex: 1 1 auto;          /* 允许按钮伸缩 */
+            justify-content: center;
+            min-width: 120px;
         }
         .btn-primary {
             background: #3b82f6;
@@ -243,6 +241,8 @@
             color: #475569;
             margin-left: 8px;
         }
+
+        /* ===== 二维码网格 ===== */
         .output-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -349,6 +349,7 @@
             text-decoration: underline;
         }
 
+        /* ===== Toast 提示 ===== */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -365,6 +366,7 @@
             pointer-events: none;
             z-index: 999;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            white-space: nowrap;
         }
         .toast.show {
             opacity: 1;
@@ -377,24 +379,143 @@
             border-radius: 30px;
             font-weight: 500;
         }
-        @media (max-width: 600px) {
-            .card {
-                padding: 18px 14px;
+
+        /* ========================================================== */
+        /* ===== 响应式断点 ===== */
+        /* ========================================================== */
+
+        /* 平板及手机 (≤768px) */
+        @media (max-width: 768px) {
+            /* 顶部 LOGO 缩小 */
+            .brand-logo {
+                width: 100px;
+                height: 100px;
             }
+            .brand {
+                padding: 20px 16px 16px;
+            }
+            .brand-content {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                text-align: center;
+            }
+            .brand-content h1 {
+                font-size: 22px;
+            }
+            .brand-content .slogan {
+                font-size: 13px;
+            }
+            .brand-content .nav-links {
+                justify-content: center;
+                gap: 6px 12px;
+            }
+            .brand-content .nav-links a {
+                font-size: 13px;
+                white-space: normal;   /* 允许换行 */
+            }
+
+            /* 特色标签 */
+            .features {
+                padding: 10px 16px;
+                gap: 8px 16px;
+                font-size: 12px;
+                justify-content: center;
+            }
+
+            /* 主卡片 */
+            .card {
+                padding: 20px 16px 24px;
+            }
+            .sub {
+                font-size: 14px;
+                padding-left: 10px;
+            }
+
+            /* 按钮：占满宽度 */
+            .actions .btn {
+                flex: 1 1 100%;
+                min-width: unset;
+                padding: 12px 16px;
+                font-size: 14px;
+                justify-content: center;
+            }
+
+            /* 二维码网格：改为2列 */
             .output-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 14px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
             }
             .qr-item .qr-wrap canvas,
             .qr-item .qr-wrap img {
                 width: 100px;
                 height: 100px;
             }
-            .actions .btn {
-                flex: 1;
-                justify-content: center;
-                padding: 10px 16px;
+
+            /* 统计信息 */
+            .stats {
                 font-size: 13px;
+                margin-left: 0;
+                text-align: center;
+                width: 100%;
+            }
+
+            /* 输入框高度适当减小 */
+            textarea {
+                height: 150px;
+            }
+
+            /* Toast 文字不换行 */
+            .toast {
+                white-space: normal;
+                max-width: 90%;
+                padding: 8px 18px;
+                font-size: 13px;
+            }
+        }
+
+        /* 超小屏手机 (≤480px) */
+        @media (max-width: 480px) {
+            .brand-logo {
+                width: 80px;
+                height: 80px;
+            }
+            .brand-content h1 {
+                font-size: 20px;
+            }
+            .brand-content .nav-links a {
+                font-size: 12px;
+            }
+            .output-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            .qr-item {
+                padding: 12px 8px 10px;
+            }
+            .qr-item .qr-wrap canvas,
+            .qr-item .qr-wrap img {
+                width: 80px;
+                height: 80px;
+            }
+            .btn {
+                font-size: 13px;
+                padding: 10px 12px;
+            }
+            .card {
+                padding: 16px 12px 20px;
+            }
+            textarea {
+                height: 120px;
+                font-size: 13px;
+                padding: 10px 12px;
+            }
+        }
+
+        /* 中等屏幕 (769px ~ 1024px) 保持默认 */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .output-grid {
+                grid-template-columns: repeat(3, 1fr);
             }
         }
     </style>
@@ -403,27 +524,24 @@
 
     <div class="container">
 
-        <!-- ============================================================ -->
         <!-- ===== 顶部品牌：LOGO 居中 + 下方品牌名/导航 ===== -->
-        <!-- ============================================================ -->
         <div class="brand">
-
-            <!-- 1️⃣ 正方形 LOGO（居中显示） -->
+            <!-- LOGO -->
             <div class="logo-area">
-                <!-- ⚠️ 把 src="logo.png" 改成你上传的图片文件名 -->
+                <!-- ⚠️ 替换成你自己的图片文件名 -->
                 <img src="logo.png" alt="RosieIP Logo" class="brand-logo">
             </div>
 
-            <!-- 2️⃣ 品牌名称 + 导航链接（左右排列） -->
+            <!-- 品牌名 + 导航 -->
             <div class="brand-content">
                 <div>
                     <h1><span>RosieIP</span>全球IP代理</h1>
                     <div class="slogan">RosieIP专属生成 SOCKS5 二维码 · 免费 · 便捷</div>
                 </div>
                 <div class="nav-links">
-                    <a href="https://rosie.onip.cc/">点击进入官网购买代理IP</a>
-                    <a href="https://t.me/RosieIP">联系TG客服</a>
-                    <a href="https://t.me/RosieIPIP">访问TG频道</a>
+                    <a href="https://rosie.onip.cc/">官网购买代理IP</a>
+                    <a href="https://t.me/RosieIP">TG客服</a>
+                    <a href="https://t.me/RosieIPIP">TG频道</a>
                 </div>
             </div>
         </div>
@@ -457,7 +575,7 @@
                 <div class="actions">
                     <button class="btn btn-primary" id="generateBtn">✨ 批量生成</button>
                     <button class="btn btn-secondary" id="clearBtn">🗑️ 清空结果</button>
-                    <button class="btn btn-success" id="downloadAllBtn" disabled>📦 打包下载全部 (ZIP)</button>
+                    <button class="btn btn-success" id="downloadAllBtn" disabled>📦 打包下载 (ZIP)</button>
                     <button class="btn btn-secondary" id="fillSampleBtn">📋 填入示例</button>
                 </div>
                 <span class="stats" id="statsInfo"></span>
@@ -475,7 +593,7 @@
             </div>
         </div>
 
-        <!-- ===== 页脚 ===== -->
+        <!-- 页脚 -->
         <div class="footer">
             &copy; 2026 RosieIP全球代理IP · 仅供技术交流使用
             <br>
@@ -508,7 +626,7 @@
                 toast.textContent = text;
                 toast.classList.add('show');
                 clearTimeout(toast._timer);
-                toast._timer = setTimeout(() => {
+                toast._timer = setTimeout(function() {
                     toast.classList.remove('show');
                 }, 2200);
             }
@@ -523,8 +641,8 @@
             }
 
             function updateStats(count) {
-                statsInfo.textContent = count > 0 ? `共 ${count} 个代理` : '';
-                countBadge.textContent = count > 0 ? `${count} 个` : '0 个';
+                statsInfo.textContent = count > 0 ? '共 ' + count + ' 个代理' : '';
+                countBadge.textContent = count > 0 ? count + ' 个' : '0 个';
                 downloadAllBtn.disabled = count === 0;
                 if (count > 0) {
                     resultCard.style.display = 'block';
@@ -536,13 +654,17 @@
             function parseLine(line) {
                 line = line.trim();
                 if (!line) return null;
-                const parts = line.split(':');
+                var parts = line.split(':');
                 if (parts.length === 2) {
-                    const [host, port] = parts;
+                    var host = parts[0],
+                        port = parts[1];
                     if (!host || !port) return null;
                     return { host: host.trim(), port: port.trim(), user: null, pass: null };
                 } else if (parts.length === 4) {
-                    const [host, port, user, pass] = parts;
+                    var host = parts[0],
+                        port = parts[1],
+                        user = parts[2],
+                        pass = parts[3];
                     if (!host || !port || !user || !pass) return null;
                     return { host: host.trim(), port: port.trim(), user: user.trim(), pass: pass.trim() };
                 } else {
@@ -551,7 +673,7 @@
             }
 
             function buildProxyUrl(parsed) {
-                let url = 'socks5://';
+                var url = 'socks5://';
                 if (parsed.user && parsed.pass) {
                     url += encodeURIComponent(parsed.user) + ':' + encodeURIComponent(parsed.pass) + '@';
                 } else if (parsed.user && !parsed.pass) {
@@ -562,33 +684,33 @@
             }
 
             function createQRItem(index, url, parsed) {
-                const div = document.createElement('div');
+                var div = document.createElement('div');
                 div.className = 'qr-item';
                 div.dataset.index = index;
 
-                const wrap = document.createElement('div');
+                var wrap = document.createElement('div');
                 wrap.className = 'qr-wrap';
-                const qrContainer = document.createElement('div');
+                var qrContainer = document.createElement('div');
                 qrContainer.id = 'qr-' + index;
                 wrap.appendChild(qrContainer);
                 div.appendChild(wrap);
 
-                const label = document.createElement('div');
+                var label = document.createElement('div');
                 label.className = 'label';
                 label.textContent = parsed.host + ':' + parsed.port;
                 div.appendChild(label);
 
-                const actions = document.createElement('div');
+                var actions = document.createElement('div');
                 actions.className = 'item-actions';
 
-                const copyBtn = document.createElement('button');
+                var copyBtn = document.createElement('button');
                 copyBtn.textContent = '复制链接';
                 copyBtn.onclick = function(e) {
                     e.stopPropagation();
                     copyToClipboard(url);
                 };
 
-                const downloadBtn = document.createElement('button');
+                var downloadBtn = document.createElement('button');
                 downloadBtn.textContent = '下载单张';
                 downloadBtn.onclick = function(e) {
                     e.stopPropagation();
